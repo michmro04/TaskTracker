@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             x:Class="TaskTracker.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+		<TextBlock Text="Panel główny" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+		<TextBlock Text="Lista aktywnych zadań i przycisk Dodaj" Opacity="0.7" HorizontalAlignment="Center"/>
+		<TextBlock Text="{Binding Tasks.Count, StringFormat='Liczba zadań w pamięci: {0}'}" HorizontalAlignment="Center"/>
+	</StackPanel>
+</UserControl>
