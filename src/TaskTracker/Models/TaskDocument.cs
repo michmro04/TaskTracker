@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace TaskTracker.Models
 {
     public class TaskDocument
     {
-        [JsonPropertyName("wersja")] private int wersja = 1;
-        [JsonPropertyName("zadania")] private List<TaskItem> tasksItems = [];
+        [JsonPropertyName("wersja")] 
+        public int Wersja { get; set; } = 1;
+        
+        [JsonPropertyName("zadania")] 
+        public List<TaskItem> Zadania { get; set; } = [];
     }
 }

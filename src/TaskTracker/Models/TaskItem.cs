@@ -6,9 +6,9 @@ namespace TaskTracker.Models
 {
     public enum  Priority
     {
-        niski  =1,
-        sredni =2,
-        wysoki =3
+        Niski  =1,
+        Sredni =2,
+        Wysoki =3
     }
 
 
@@ -18,22 +18,22 @@ namespace TaskTracker.Models
         public int Id { get; set; }
         
         [JsonPropertyName("tytul")] 
-        private string Tytul { get; set; } = String.Empty;  //może być pusty
+        public string Tytul { get; set; } = String.Empty;  //może być pusty
         
-        [JsonPropertyName("opis")] 
-        private string Opis { get; set; } = String.Empty;   //może być pusty
+        [JsonPropertyName("opis")]
+        public string Opis { get; set; } = String.Empty;   //może być pusty
         
-        [JsonPropertyName("termin")] 
-        private DateOnly? Termin { get; set; }              //może być null
+        [JsonPropertyName("termin")]
+        public DateOnly? Termin { get; set; }              //może być null
         
-        [JsonPropertyName("priorytet")] 
-        private Priority Priorytet { get; set; } = Priority.sredni;
+        [JsonPropertyName("priorytet")]
+        public Priority Priorytet { get; set; } = Priority.Sredni;
         
-        [JsonPropertyName("wykonane")] 
-        private bool Wykonane { get; set; }
+        [JsonPropertyName("wykonane")]
+        public bool Wykonane { get; set; }
         
-        [JsonPropertyName("tagi")] 
-        private List<string> Tagi { get; set; } = [];       //domyślnie pusta
+        [JsonPropertyName("tagi")]
+        public List<string> Tagi { get; set; } = [];       //domyślnie pusta
 
 
         //funkcja pomocnicza - aby user podczas edycji działa na kopii zadania
@@ -51,7 +51,7 @@ namespace TaskTracker.Models
 
         public override string ToString()
         {
-            var status = Wykonane ? "wykonane" : " --- ";
+            var status = Wykonane ? "WYKONANE" : " ----- ";
             var date = Termin?.ToString("yyyy-MM-dd") ?? "brak terminu";
             return $"#{Id} {Tytul} - {status} - ({Priorytet}, {date})";
         }
