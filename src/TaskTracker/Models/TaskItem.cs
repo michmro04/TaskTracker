@@ -35,5 +35,25 @@ namespace TaskTracker.Models
         [JsonPropertyName("tagi")] 
         private List<string> Tagi { get; set; } = [];       //domyślnie pusta
 
+
+        //funkcja pomocnicza - aby user podczas edycji działa na kopii zadania
+        //  i gdy kliknie 'anuluj' oryginał nie będzie zmieniony
+        public TaskItem Clone() => new()
+        {
+            Id = Id,
+            Tytul = Tytul,
+            Opis = Opis,
+            Termin = Termin,
+            Priorytet = Priorytet,
+            Wykonane = Wykonane,
+            Tagi = [.. Tagi]
+        };
+
+        public override string ToString()
+        {
+            var status = Wykonane ? "wykonane" : " --- ";
+            var date = Termin?.ToString("yyyy-MM-dd") ?? "brak terminu";
+            return $"#{Id} {Tytul} - {status} - ({Priorytet}, {date})";
+        }
     }
 }
