@@ -1,22 +1,85 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TaskTracker.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:services="using:TaskTracker.Services"
+        Background="{DynamicResource AppBackgroundBrush}"
         x:Class="TaskTracker.Views.MainWindow"
-        x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="TaskTracker">
+        x:DataType="vm:MainWindowViewModel"
+        Title="TaskTracker"
+        Width="1050"
+        Height="700"
+        MinWidth="800"
+        MinHeight="550">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- górny pasek nawigacji i plików json -->
+        <Border Grid.Row="0" Padding="16,12" Background="{DynamicResource AppHeaderBrush}"
+                BorderThickness="0,0,0,1" BorderBrush="{DynamicResource AppBorderBrush}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+				<TextBlock Grid.Column="0"
+                           Text="TaskTracker"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+				<!-- przełączanie 3 paneli -->
+				<StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="8">
+					<Button Content="Smart"
+                            Command="{Binding ShowSmartCommand}"
+                            Classes.accent="{Binding IsSmartActive}"/>
+					<Button Content="Do zrobienia"
+                            Command="{Binding ShowDashboardCommand}"
+                            Classes.accent="{Binding IsDashboardActive}"/>
+					<Button Content="Wszystkie / Archiwum"
+                            Command="{Binding ShowAllTasksCommand}"
+                            Classes.accent="{Binding IsAllTasksActive}"/>
+				</StackPanel>
 
+				<!-- przyciski wczytywania i zapisu JSON -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                    <ComboBox ItemsSource="{Binding AccentOptions}" SelectedItem="{Binding SelectedAccent}"
+                              Width="135" ToolTip.Tip="Kolor akcentu">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="services:AccentOption">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Border Width="12"
+                                            Height="12"
+                                            CornerRadius="6"
+                                            Background="{Binding Brush}"
+                                            BorderBrush="{DynamicResource AppBorderBrush}"
+                                            BorderThickness="1"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button Content="{Binding ThemeButtonLabel}"
+                            Command="{Binding ToggleThemeCommand}"/>
+
+                    <Button Content="Wczytaj JSON" Click="OnLoadJsonClick"/>
+                    <Button Content="Zapisz JSON" Click="OnSaveJsonClick"/>
+                </StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- aktywny panel z animacją przesuwania (slide) -->
+		<TransitioningContentControl Grid.Row="1"
+                                     Content="{Binding CurrentPage}"
+                                     IsTransitionReversed="{Binding IsSlideReversed}"
+                                     Padding="20">
+			<TransitioningContentControl.PageTransition>
+				<PageSlide Duration="0:0:0.25" Orientation="Horizontal"/>
+			</TransitioningContentControl.PageTransition>
+		</TransitioningContentControl>
+
+		<!-- dolny pasek statusu -->
+        <Border Grid.Row="2" Padding="16,8" Background="{DynamicResource AppHeaderBrush}" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource AppBorderBrush}">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.8"/>
+		</Border>
+	</Grid>
 </Window>

@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Remove="Views\AllTasksView.axaml" />
+    <AvaloniaXaml Remove="Views\DashboardView.axaml" />
   </ItemGroup>
 
   <ItemGroup>
