@@ -13,31 +13,39 @@
 				<TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
 			</StackPanel>
 
-			<StackPanel Grid.Column="1"
+            <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
                         Spacing="8"
                         VerticalAlignment="Center"
                         Margin="0,0,12,0">
-				<TextBlock Text="Tag:" VerticalAlignment="Center"/>
-				<ComboBox ItemsSource="{Binding TagOptions}"
+                <TextBlock Text="Tag:" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding TagOptions}"
                           SelectedItem="{Binding SelectedTag}"
-                          Width="135"
+                          Width="125"
                           ToolTip.Tip="Pokaż tylko zadania z wybranym tagiem"/>
 
-				<TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="4,0,0,0"/>
-				<ComboBox ItemsSource="{Binding SortOptions}"
-                          SelectedItem="{Binding SelectedSort}"
-                          Width="115"/>
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0,0,0">
+                    <TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSort}"
+                              Width="105"/>
+                    <Button Content="{Binding SortDirectionIcon}"
+                            Command="{Binding ToggleSortDirectionCommand}"
+                            ToolTip.Tip="{Binding SortDirectionTooltip}"
+                            Width="32"
+                            HorizontalContentAlignment="Center"
+                            FontWeight="Bold"/>
+                </StackPanel>
 
-				<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0,0,0">
-					<Button Content="Kafelki"
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0,0,0">
+                    <Button Content="Kafelki"
                             Command="{Binding SetTileViewCommand}"
                             Classes.accent="{Binding IsTileView}"/>
-					<Button Content="Lista"
+                    <Button Content="Lista"
                             Command="{Binding SetListViewCommand}"
                             Classes.accent="{Binding IsListView}"/>
-				</StackPanel>
-			</StackPanel>
+                </StackPanel>
+            </StackPanel>
 
 			<Button Grid.Column="2"
                     Content="+ Dodaj nowe zadanie"
