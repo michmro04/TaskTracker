@@ -274,6 +274,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void RefreshPanels()
     {
         DashboardVm.Refresh();
+        SmartVm.Recalculate();
     }
 
     private void ClearTasks()
