@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using TaskTracker.Models;
 using TaskTracker.Services;
 
@@ -54,4 +55,18 @@ public partial class AllTasksViewModel : ViewModelBase
         IsEmpty = Cards.Count == 0;
         SummaryText = $"Wykonane: {Cards.Count} z {Tasks.Count} · odznacz zadanie, aby przywrócić je do \"Do zrobienia\"";
     }
+
+
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTileView))]
+    private bool isListView;
+
+    public bool IsTileView => !IsListView;
+
+    [RelayCommand]
+    private void SetTileView() => IsListView = false;
+
+    [RelayCommand]
+    private void SetListView() => IsListView = true;
 }

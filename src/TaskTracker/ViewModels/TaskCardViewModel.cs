@@ -110,4 +110,25 @@ public partial class TaskCardViewModel : ViewModelBase
     {
         owner.DeleteTask(Item);
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DescriptionToggleIcon))]
+    private bool isDescriptionExpanded;
+
+    public string DescriptionToggleIcon => IsDescriptionExpanded ? "▴" : "▾";
+
+    public string DescriptionPreview =>
+        string.IsNullOrWhiteSpace(Item.Opis)
+            ? string.Empty
+            : Item.Opis.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ").Trim();
+
+    [RelayCommand]
+    private void ToggleDescription()
+    {
+        IsDescriptionExpanded = !IsDescriptionExpanded;
+    }
+
+    [ObservableProperty]
+    private bool canExpandDescription;
+
 }

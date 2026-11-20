@@ -45,7 +45,15 @@ public partial class DashboardViewModel : ViewModelBase
 
     partial void OnSelectedSortChanged(string value)
     {
-        Refresh();
+        bool defaultDescending = value == "Priorytet";
+        if (IsSortDescending != defaultDescending)
+        {
+            IsSortDescending = defaultDescending;
+        }
+        else
+        {
+            Refresh();
+        }
     }
 
     partial void OnSelectedTagChanged(string? value)
@@ -54,6 +62,33 @@ public partial class DashboardViewModel : ViewModelBase
         {
             Refresh();
         }
+    }
+
+    private int CompareTasks(TaskItem a, TaskItem b)
+    {
+        if (SelectedSort == "Priorytet")
+        {
+            return IsSortDescending
+                ? TaskSorting.ByPriority(a, b)
+                : TaskSorting.ByPriority(b, a);
+        }
+
+        if (SelectedSort == "Tag")
+        {
+            if (a.Tagi.Count == 0 && b.Tagi.Count > 0) return 1;
+            if (a.Tagi.Count > 0 && b.Tagi.Count == 0) return -1;
+
+            return IsSortDescending
+                ? TaskSorting.ByTag(b, a)
+                : TaskSorting.ByTag(a, b);
+        }
+
+        if (a.Termin == null && b.Termin != null) return 1;
+        if (a.Termin != null && b.Termin == null) return -1;
+
+        return IsSortDescending
+            ? TaskSorting.ByDeadline(b, a)
+            : TaskSorting.ByDeadline(a, b);
     }
 
     public void Refresh()
@@ -77,15 +112,15 @@ public partial class DashboardViewModel : ViewModelBase
 
         if (SelectedSort == "Priorytet")
         {
-            todo.Sort(TaskSorting.ByPriority);
+            todo.Sort(CompareTasks);
         }
         else if (SelectedSort == "Tag")
         {
-            todo.Sort(TaskSorting.ByTag);
+            todo.Sort(CompareTasks);
         }
         else
         {
-            todo.Sort(TaskSorting.ByDeadline);
+            todo.Sort(CompareTasks);
         }
 
         Cards.Clear();
@@ -133,4 +168,41 @@ public partial class DashboardViewModel : ViewModelBase
     {
         owner.OpenEditor(null);
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTileView))]
+    private bool isListView;
+
+    public bool IsTileView => !IsListView;
+
+    [RelayCommand]
+    private void SetTileView() => IsListView = false;
+
+    [RelayCommand]
+    private void SetListView() => IsListView = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SortDirectionIcon))]
+    [NotifyPropertyChangedFor(nameof(SortDirectionTooltip))]
+    private bool isSortDescending;
+
+    public string SortDirectionIcon => IsSortDescending ? "↓" : "↑";
+
+    public string SortDirectionTooltip => IsSortDescending
+        ? "Sortowanie malejące (kliknij, aby zmienić na rosnące)"
+        : "Sortowanie rosnące (kliknij, aby zmienić na malejące)";
+
+    [RelayCommand]
+    private void ToggleSortDirection()
+    {
+        IsSortDescending = !IsSortDescending;
+    }
+
+    partial void OnIsSortDescendingChanged(bool value)
+    {
+        Refresh();
+    }
+
+
+
 }

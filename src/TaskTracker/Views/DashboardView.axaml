@@ -1,16 +1,17 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:TaskTracker.ViewModels"
+             xmlns:views="using:TaskTracker.Views"
              x:Class="TaskTracker.Views.DashboardView"
              x:DataType="vm:DashboardViewModel">
 
-    <Grid RowDefinitions="Auto,*">
+	<Grid RowDefinitions="Auto,*">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
-            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Text="Do zrobienia" FontSize="22" FontWeight="Bold"/>
-                <TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
-            </StackPanel>
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center">
+				<TextBlock Text="Do zrobienia" FontSize="22" FontWeight="Bold"/>
+				<TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
+			</StackPanel>
 
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
@@ -20,37 +21,77 @@
                 <TextBlock Text="Tag:" VerticalAlignment="Center"/>
                 <ComboBox ItemsSource="{Binding TagOptions}"
                           SelectedItem="{Binding SelectedTag}"
-                          Width="150"
+                          Width="125"
                           ToolTip.Tip="Pokaż tylko zadania z wybranym tagiem"/>
 
-                <TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                <ComboBox ItemsSource="{Binding SortOptions}"
-                          SelectedItem="{Binding SelectedSort}"
-                          Width="130"/>
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0,0,0">
+                    <TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <ComboBox ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSort}"
+                              Width="105"/>
+                    <Button Content="{Binding SortDirectionIcon}"
+                            Command="{Binding ToggleSortDirectionCommand}"
+                            ToolTip.Tip="{Binding SortDirectionTooltip}"
+                            Width="32"
+                            HorizontalContentAlignment="Center"
+                            FontWeight="Bold"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0,0,0">
+                    <Button Content="Kafelki"
+                            Command="{Binding SetTileViewCommand}"
+                            Classes.accent="{Binding IsTileView}"/>
+                    <Button Content="Lista"
+                            Command="{Binding SetListViewCommand}"
+                            Classes.accent="{Binding IsListView}"/>
+                </StackPanel>
             </StackPanel>
 
-            <Button Grid.Column="2"
+			<Button Grid.Column="2"
                     Content="+ Dodaj nowe zadanie"
                     Classes="accent"
                     VerticalAlignment="Center"
                     Command="{Binding AddNewTaskCommand}"/>
-        </Grid>
+		</Grid>
 
-        <ScrollViewer Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding Cards}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </ScrollViewer>
+		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+			<ItemsControl ItemsSource="{Binding Cards}"
+                          Classes.list="{Binding IsListView}">
+				<ItemsControl.Styles>
+					<!-- Tryb kafelki -->
+					<Style Selector="ItemsControl:not(.list)">
+						<Setter Property="ItemsPanel">
+							<ItemsPanelTemplate>
+								<WrapPanel/>
+							</ItemsPanelTemplate>
+						</Setter>
+					</Style>
+					<Style Selector="ItemsControl:not(.list) views|TaskCardView">
+						<Setter Property="Width" Value="330"/>
+						<Setter Property="Margin" Value="0,0,12,12"/>
+					</Style>
 
-        <TextBlock Grid.Row="1"
+					<!-- Tryb lista -->
+					<Style Selector="ItemsControl.list">
+						<Setter Property="ItemsPanel">
+							<ItemsPanelTemplate>
+								<StackPanel Spacing="10"/>
+							</ItemsPanelTemplate>
+						</Setter>
+					</Style>
+					<Style Selector="ItemsControl.list views|TaskCardView">
+						<Setter Property="HorizontalAlignment" Value="Stretch"/>
+						<Setter Property="Margin" Value="0,0,12,0"/>
+					</Style>
+				</ItemsControl.Styles>
+			</ItemsControl>
+		</ScrollViewer>
+
+		<TextBlock Grid.Row="1"
                    Text="Brak zadań do zrobienia. Dodaj nowe albo wczytaj plik."
                    Opacity="0.6"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    IsVisible="{Binding IsEmpty}"/>
-    </Grid>
+	</Grid>
 </UserControl>

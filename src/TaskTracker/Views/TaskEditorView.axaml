@@ -5,7 +5,7 @@
              x:DataType="vm:TaskEditorViewModel">
 
     <ScrollViewer>
-        <Border MaxWidth="560"
+        <Border Width="560"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 Padding="24"
@@ -33,7 +33,7 @@
                     <TextBox Text="{Binding Opis}"
                              AcceptsReturn="True"
                              TextWrapping="Wrap"
-                             MinHeight="80"/>
+                             MinHeight="110"/>
                 </StackPanel>
 
                 <!-- termin + priorytet obok siebie -->
