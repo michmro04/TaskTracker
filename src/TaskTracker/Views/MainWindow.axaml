@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TaskTracker.ViewModels"
+        xmlns:services="using:TaskTracker.Services"
+        Background="{DynamicResource AppBackgroundBrush}"
         x:Class="TaskTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="TaskTracker"
@@ -10,9 +12,10 @@
         MinHeight="550">
 
 	<Grid RowDefinitions="Auto,*,Auto">
-		<!-- górny pasek nawigacji i plików JSON -->
-		<Border Grid.Row="0" Padding="16,12" BorderThickness="0,0,0,1" BorderBrush="#33888888">
-			<Grid ColumnDefinitions="Auto,*,Auto">
+		<!-- górny pasek nawigacji i plików json -->
+        <Border Grid.Row="0" Padding="16,12" Background="{DynamicResource AppHeaderBrush}"
+                BorderThickness="0,0,0,1" BorderBrush="{DynamicResource AppBorderBrush}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
 				<TextBlock Grid.Column="0"
                            Text="TaskTracker"
                            FontSize="20"
@@ -36,12 +39,30 @@
 				</StackPanel>
 
 				<!-- przyciski wczytywania i zapisu JSON -->
-				<StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            Spacing="8">
-					<Button Content="Wczytaj JSON" Click="OnLoadJsonClick"/>
-					<Button Content="Zapisz JSON" Click="OnSaveJsonClick"/>
-				</StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                    <ComboBox ItemsSource="{Binding AccentOptions}" SelectedItem="{Binding SelectedAccent}"
+                              Width="135" ToolTip.Tip="Kolor akcentu">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="services:AccentOption">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Border Width="12"
+                                            Height="12"
+                                            CornerRadius="6"
+                                            Background="{Binding Brush}"
+                                            BorderBrush="{DynamicResource AppBorderBrush}"
+                                            BorderThickness="1"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button Content="{Binding ThemeButtonLabel}"
+                            Command="{Binding ToggleThemeCommand}"/>
+
+                    <Button Content="Wczytaj JSON" Click="OnLoadJsonClick"/>
+                    <Button Content="Zapisz JSON" Click="OnSaveJsonClick"/>
+                </StackPanel>
 			</Grid>
 		</Border>
 
@@ -56,8 +77,9 @@
 		</TransitioningContentControl>
 
 		<!-- dolny pasek statusu -->
-		<Border Grid.Row="2" Padding="16,8" BorderThickness="0,1,0,0" BorderBrush="#33888888">
-			<TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.8"/>
+        <Border Grid.Row="2" Padding="16,8" Background="{DynamicResource AppHeaderBrush}" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource AppBorderBrush}">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.8"/>
 		</Border>
 	</Grid>
 </Window>

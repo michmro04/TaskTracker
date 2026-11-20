@@ -1,9 +1,10 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using TaskTracker.Models;
 using TaskTracker.Services;
 
@@ -29,6 +30,26 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(IsAllTasksActive))]
     private int _activeTabIndex = 1; // 0 = Smart, 1 = Dashboard, 2 = AllTasks
 
+    public IReadOnlyList<AccentOption> AccentOptions => ThemeService.AccentOptions; //themes
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ThemeButtonLabel))]
+    private bool _isDarkMode = true;
+
+    [ObservableProperty]
+    private AccentOption _selectedAccent = ThemeService.AccentOptions[0];
+
+    public string ThemeButtonLabel => IsDarkMode ? "Tryb: Ciemny" : "Tryb: Jasny";
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        IsDarkMode = !IsDarkMode;
+    }
+
+    partial void OnIsDarkModeChanged(bool value) => ThemeService.ApplyTheme(SelectedAccent, value);
+
+    partial void OnSelectedAccentChanged(AccentOption value) => ThemeService.ApplyTheme(value, IsDarkMode);
+
     [ObservableProperty]
     private bool _isSlideReversed;
 
@@ -52,6 +73,7 @@ public partial class MainWindowViewModel : ViewModelBase
         AllTasksVm = new AllTasksViewModel(Tasks);
 
         _currentPage = DashboardVm;
+        ThemeService.ApplyTheme(_selectedAccent, _isDarkMode);
     }
 
     [RelayCommand]
