@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:TaskTracker.ViewModels"
+             xmlns:controls="using:TaskTracker.Controls"
              xmlns:sys="using:System"
              x:Class="TaskTracker.Views.SmartView"
              x:DataType="vm:SmartViewModel">
@@ -18,27 +19,36 @@
 			<Setter Property="Background" Value="{DynamicResource AppCardBrush}"/>
 			<Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="CornerRadius" Value="8"/>
 			<Setter Property="Opacity" Value="0.5"/>
 		</Style>
+		<!-- blok sesji: tło w kolorze priorytetu -->
 		<Style Selector="Border.session">
-			<Setter Property="Background" Value="{DynamicResource AppButtonBrush}"/>
-			<Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="2"/>
 			<Setter Property="CornerRadius" Value="6"/>
 			<Setter Property="Padding" Value="6,4"/>
 			<Setter Property="Margin" Value="1,0"/>
 			<Setter Property="ClipToBounds" Value="True"/>
 		</Style>
-		<!-- sesja zadania z terminem na ten dzień - akcent po lewej -->
+		<Style Selector="Border.session TextBlock">
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="TextWrapping" Value="NoWrap"/>
+			<Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+		</Style>
+		<!-- zadanie z terminem na ten dzień (lub wcześniej) - biała obwódka -->
 		<Style Selector="Border.session.due">
-			<Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}"/>
-			<Setter Property="BorderThickness" Value="3,1,1,1"/>
+			<Setter Property="BorderBrush" Value="White"/>
 		</Style>
 		<!-- przerwa -->
 		<Style Selector="Border.session.free">
 			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="Opacity" Value="0.5"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Opacity" Value="0.6"/>
+		</Style>
+		<Style Selector="Border.session.free TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
 		</Style>
 		<Style Selector="NumericUpDown">
 			<Setter Property="FormatString" Value="0"/>
@@ -52,6 +62,10 @@
 			<StackPanel Spacing="8">
 				<WrapPanel Orientation="Horizontal">
 					<StackPanel Margin="0,0,24,0" Spacing="4">
+						<TextBlock Text="Liczba dni" FontSize="12" Opacity="0.7"/>
+						<NumericUpDown Value="{Binding DaysAhead}" Minimum="1" Maximum="14" Increment="1" Width="130"/>
+					</StackPanel>
+					<StackPanel Margin="0,0,24,0" Spacing="4">
 						<TextBlock Text="Min. długość sesji (min)" FontSize="12" Opacity="0.7"/>
 						<NumericUpDown Value="{Binding MinSessionMinutes}" Minimum="5" Maximum="240" Increment="5" Width="150"/>
 					</StackPanel>
@@ -60,7 +74,7 @@
 						<NumericUpDown Value="{Binding MaxSessionMinutes}" Minimum="5" Maximum="240" Increment="5" Width="150"/>
 					</StackPanel>
 				</WrapPanel>
-				<TextBlock Text="{Binding Summary}" Opacity="0.8"/>
+				<TextBlock Text="{Binding Summary}" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
 			</StackPanel>
 		</Border>
 
@@ -73,65 +87,62 @@
 				<ItemsControl ItemsSource="{Binding Warnings}">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="sys:String">
-							<TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+							<TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
 			</StackPanel>
 		</Border>
 
-		<!-- 5 dni: dzień po lewej, oś czasu z sesjami po prawej -->
-		<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+		<!-- dni: dzień po lewej, oś czasu z sesjami po prawej na całą szerokość -->
+		<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 			<ItemsControl ItemsSource="{Binding Days}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate x:DataType="vm:DayPlanViewModel">
-						<Grid ColumnDefinitions="210,*" Margin="0,0,0,8">
+						<Grid ColumnDefinitions="190,*" Margin="0,0,0,8">
 
 							<!-- dzień -->
-							<Border Grid.Column="0" Classes="card" Margin="0,0,8,0">
+							<Border Grid.Column="0" Classes="card" Margin="0,0,8,0" Padding="10,8">
 								<StackPanel Spacing="4">
-									<TextBlock Text="{Binding Header}" FontWeight="Bold" TextWrapping="Wrap"/>
-									<TextBlock Text="Mam czasu (min)" FontSize="11" Opacity="0.7"/>
-									<NumericUpDown Value="{Binding AvailableMinutes}" Minimum="0" Maximum="1440" Increment="15"/>
-									<TextBlock Text="{Binding CapacityText}" FontSize="11" Opacity="0.7" TextWrapping="Wrap"/>
+									<TextBlock Text="{Binding Header}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+									<NumericUpDown Value="{Binding AvailableMinutes}" Minimum="0" Maximum="1440" Increment="15"
+									               ToolTip.Tip="Ile minut mam tego dnia"/>
+									<TextBlock Text="{Binding CapacityText}" FontSize="11" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
 								</StackPanel>
 							</Border>
 
-							<!-- oś czasu -->
-							<ScrollViewer Grid.Column="1"
-							              HorizontalScrollBarVisibility="Auto"
-							              VerticalScrollBarVisibility="Disabled"
-							              VerticalAlignment="Center">
-								<Panel HorizontalAlignment="Left" Height="76" Margin="0,0,0,6">
-									<Border Classes="track" Width="{Binding TrackWidth}" HorizontalAlignment="Left"/>
-									<ItemsControl ItemsSource="{Binding Sessions}" Margin="0,4">
-										<ItemsControl.ItemsPanel>
-											<ItemsPanelTemplate>
-												<StackPanel Orientation="Horizontal"/>
-											</ItemsPanelTemplate>
-										</ItemsControl.ItemsPanel>
-										<ItemsControl.ItemTemplate>
-											<DataTemplate x:DataType="vm:SessionRow">
-												<!-- zewnętrzny kontener trzyma dokładną szerokość = długość sesji -->
-												<Panel Width="{Binding Width}" ToolTip.Tip="{Binding ToolTip}">
-													<Border Classes="session"
-													        Classes.free="{Binding IsFree}"
-													        Classes.due="{Binding IsDueToday}">
-														<StackPanel Spacing="1">
-															<TextBlock Text="{Binding TimeText}" FontSize="10" Opacity="0.6"
-															           TextTrimming="CharacterEllipsis"/>
-															<TextBlock Text="{Binding Title}" FontWeight="SemiBold"
-															           TextTrimming="CharacterEllipsis"/>
-															<TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.7"
-															           TextTrimming="CharacterEllipsis"/>
-														</StackPanel>
-													</Border>
-												</Panel>
-											</DataTemplate>
-										</ItemsControl.ItemTemplate>
-									</ItemsControl>
-								</Panel>
-							</ScrollViewer>
+							<!-- oś czasu: pełna szerokość = cały dostępny czas dnia -->
+							<Panel Grid.Column="1">
+								<Border Classes="track"/>
+								<ItemsControl ItemsSource="{Binding Sessions}" Margin="2,4">
+									<ItemsControl.Styles>
+										<!-- szerokość bloku = długość sesji (przekazana do TimelinePanel) -->
+										<Style Selector="ContentPresenter" x:DataType="vm:SessionRow">
+											<Setter Property="controls:TimelinePanel.Minutes" Value="{Binding LengthMinutes}"/>
+										</Style>
+									</ItemsControl.Styles>
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<controls:TimelinePanel TotalMinutes="{Binding AvailableMinutes}"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="vm:SessionRow">
+											<Border Classes="session"
+											        Background="{Binding PriorityBrush}"
+											        Classes.free="{Binding IsFree}"
+											        Classes.due="{Binding IsDueToday}"
+											        ToolTip.Tip="{Binding ToolTip}">
+												<StackPanel Spacing="1" VerticalAlignment="Center">
+													<TextBlock Text="{Binding TimeText}" FontSize="10" Opacity="0.8"/>
+													<TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+													<TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.85"/>
+												</StackPanel>
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</Panel>
 						</Grid>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>

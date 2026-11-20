@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TaskTracker.Models;
@@ -9,7 +10,10 @@ namespace TaskTracker.ViewModels;
 
 public partial class DashboardViewModel : ViewModelBase
 {
+    public const string AllTags = "Wszystkie tagi";
+
     private readonly MainWindowViewModel owner;
+    private bool updatingTags;
 
     public ObservableCollection<TaskItem> Tasks { get; }
 
@@ -17,8 +21,14 @@ public partial class DashboardViewModel : ViewModelBase
 
     public string[] SortOptions { get; } = ["Termin", "Priorytet", "Tag"];
 
+    /// <summary>Opcje filtra: "Wszystkie tagi" + tagi z niewykonanych zadań.</summary>
+    public ObservableCollection<string> TagOptions { get; } = [AllTags];
+
     [ObservableProperty]
     private string selectedSort = "Termin";
+
+    [ObservableProperty]
+    private string? selectedTag = AllTags;
 
     [ObservableProperty]
     private string summaryText = string.Empty;
@@ -38,6 +48,14 @@ public partial class DashboardViewModel : ViewModelBase
         Refresh();
     }
 
+    partial void OnSelectedTagChanged(string? value)
+    {
+        if (!updatingTags)
+        {
+            Refresh();
+        }
+    }
+
     public void Refresh()
     {
         var todo = new List<TaskItem>();
@@ -47,6 +65,14 @@ public partial class DashboardViewModel : ViewModelBase
             {
                 todo.Add(task);
             }
+        }
+
+        UpdateTagOptions(todo);
+
+        var filterActive = SelectedTag != null && SelectedTag != AllTags;
+        if (filterActive)
+        {
+            todo = todo.Where(t => TaskTags.HasTag(t, SelectedTag!)).ToList();
         }
 
         if (SelectedSort == "Priorytet")
@@ -69,7 +95,37 @@ public partial class DashboardViewModel : ViewModelBase
         }
 
         IsEmpty = Cards.Count == 0;
-        SummaryText = $"Do zrobienia: {Cards.Count} z {Tasks.Count}";
+        SummaryText = filterActive
+            ? $"Do zrobienia z tagiem \"{SelectedTag}\": {Cards.Count}"
+            : $"Do zrobienia: {Cards.Count} z {Tasks.Count}";
+    }
+
+    /// <summary>Odświeża listę tagów w filtrze, zachowując wybór (jeśli tag nadal istnieje).</summary>
+    private void UpdateTagOptions(List<TaskItem> todo)
+    {
+        var wanted = new List<string> { AllTags };
+        wanted.AddRange(TaskTags.Collect(todo));
+
+        if (wanted.SequenceEqual(TagOptions))
+        {
+            return;
+        }
+
+        var previous = SelectedTag;
+        updatingTags = true;
+        try
+        {
+            TagOptions.Clear();
+            foreach (var tag in wanted)
+            {
+                TagOptions.Add(tag);
+            }
+            SelectedTag = previous != null && wanted.Contains(previous) ? previous : AllTags;
+        }
+        finally
+        {
+            updatingTags = false;
+        }
     }
 
     [RelayCommand]

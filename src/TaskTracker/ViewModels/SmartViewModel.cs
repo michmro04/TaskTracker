@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TaskTracker.Models;
 using TaskTracker.Services;
@@ -10,19 +11,21 @@ namespace TaskTracker.ViewModels;
 
 public partial class SmartViewModel : ViewModelBase
 {
-    private const int DaysAhead = 5;
+    public const int MinDays = 1;
+    public const int MaxDays = 14;
     private const int DefaultDailyMinutes = 120;
-
-    /// <summary>Skala osi czasu: ile pikseli przypada na minutę.</summary>
-    public const double PixelsPerMinute = 2.0;
 
     public ObservableCollection<TaskItem> Tasks { get; }
 
-    /// <summary>Plan na kolejne 5 dni (dziś + 4).</summary>
+    /// <summary>Plan na kolejne dni (dziś + następne), tyle ile ustawiono w <see cref="DaysAhead"/>.</summary>
     public ObservableCollection<DayPlanViewModel> Days { get; } = [];
 
     /// <summary>Zadania, których nie da się skończyć przed terminem.</summary>
     public ObservableCollection<string> Warnings { get; } = [];
+
+    /// <summary>Ile dni pokazuje plan.</summary>
+    [ObservableProperty]
+    private int _daysAhead = 5;
 
     [ObservableProperty]
     private int _minSessionMinutes = 25;
@@ -43,14 +46,24 @@ public partial class SmartViewModel : ViewModelBase
     {
         Tasks = tasks;
 
-        for (var i = 0; i < DaysAhead; i++)
-        {
-            Days.Add(new DayPlanViewModel(DefaultDailyMinutes, Recalculate));
-        }
+        SyncDayCount();
 
         // każde wczytanie / dodanie / usunięcie zadania przelicza plan
         Tasks.CollectionChanged += (_, _) => Recalculate();
 
+        Recalculate();
+    }
+
+    partial void OnDaysAheadChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinDays, MaxDays);
+        if (clamped != value)
+        {
+            DaysAhead = clamped; // wywoła tę metodę ponownie z poprawną wartością
+            return;
+        }
+
+        SyncDayCount();
         Recalculate();
     }
 
@@ -74,10 +87,23 @@ public partial class SmartViewModel : ViewModelBase
         Recalculate();
     }
 
+    /// <summary>Dodaje / usuwa dni tak, żeby było ich DaysAhead. Istniejące dni zachowują ustawiony czas.</summary>
+    private void SyncDayCount()
+    {
+        while (Days.Count < DaysAhead)
+        {
+            Days.Add(new DayPlanViewModel(DefaultDailyMinutes, Recalculate));
+        }
+        while (Days.Count > DaysAhead)
+        {
+            Days.RemoveAt(Days.Count - 1);
+        }
+    }
+
     public void Recalculate()
     {
-        // konstruktor jeszcze nie dodał wszystkich dni albo ustawienia są niepoprawne
-        if (Days.Count < DaysAhead || MinSessionMinutes <= 0)
+        // dni jeszcze nie zsynchronizowane albo ustawienia są niepoprawne
+        if (Days.Count != DaysAhead || MinSessionMinutes <= 0)
         {
             return;
         }
@@ -128,7 +154,7 @@ public partial class DayPlanViewModel : ObservableObject
         _onChanged = onChanged;
     }
 
-    /// <summary>Ile minut mam danego dnia – ustawiane przez użytkownika.</summary>
+    /// <summary>Ile minut mam danego dnia – ustawiane przez użytkownika. Pełna szerokość osi czasu = ten czas.</summary>
     [ObservableProperty]
     private int _availableMinutes;
 
@@ -138,17 +164,13 @@ public partial class DayPlanViewModel : ObservableObject
     [ObservableProperty]
     private string _capacityText = string.Empty;
 
-    /// <summary>Szerokość tła osi czasu (cały dostępny czas dnia) w pikselach.</summary>
-    [ObservableProperty]
-    private double _trackWidth;
-
     public ObservableCollection<SessionRow> Sessions { get; } = [];
 
     partial void OnAvailableMinutesChanged(int value) => _onChanged();
 
     public void Apply(PlannedDay day, DateOnly today)
     {
-        var name = day.Date.ToString("dddd, dd.MM", Pl);
+        var name = day.Date.ToString("ddd, dd.MM", Pl);
         name = char.ToUpper(name[0], Pl) + name[1..];
         var offset = day.Date.DayNumber - today.DayNumber;
         Header = offset switch
@@ -159,9 +181,7 @@ public partial class DayPlanViewModel : ObservableObject
         };
 
         var work = day.Sessions.Where(s => !s.IsFree).ToList();
-        CapacityText = $"{work.Count} sesji · {SmartViewModel.FormatMinutes(work.Sum(s => s.LengthMinutes))} pracy";
-
-        TrackWidth = day.AvailableMinutes * SmartViewModel.PixelsPerMinute;
+        CapacityText = $"{work.Count} sesji · {SmartViewModel.FormatMinutes(work.Sum(s => s.LengthMinutes))}";
 
         Sessions.Clear();
         foreach (var s in day.Sessions)
@@ -177,26 +197,39 @@ public sealed record SessionRow(
     string Title,
     string Details,
     string ToolTip,
-    double Width,
+    double LengthMinutes,
+    IBrush? PriorityBrush,
     bool IsFree,
     bool IsDueToday)
 {
+    // te same kolory co na kafelkach w "Do zrobienia"
+    private static readonly IBrush High = Brush.Parse("#EF4444");
+    private static readonly IBrush Medium = Brush.Parse("#F59E0B");
+    private static readonly IBrush Low = Brush.Parse("#22C55E");
+
+    public static IBrush BrushFor(Priority priority) => priority switch
+    {
+        Priority.Wysoki => High,
+        Priority.Niski => Low,
+        _ => Medium
+    };
+
     public static SessionRow From(PlannedSession s, DateOnly date)
     {
         var time = $"{Clock(s.StartMinute)}–{Clock(s.EndMinute)}";
-        var width = s.LengthMinutes * SmartViewModel.PixelsPerMinute;
 
         if (s.Task is null)
         {
-            return new SessionRow(time, "Przerwa", $"{s.LengthMinutes} min", $"Przerwa · {time}", width, true, false);
+            return new SessionRow(time, "Przerwa", $"{s.LengthMinutes} min", $"Przerwa · {time}",
+                s.LengthMinutes, null, true, false);
         }
 
         var t = s.Task;
         var deadline = t.Termin is { } d ? $"termin {d:dd.MM}" : "bez terminu";
         var dueToday = t.Termin is { } dd && dd <= date;
-        var details = $"{s.LengthMinutes} min · {t.Priorytet}";
+        var details = $"{s.LengthMinutes} min · {deadline}";
         var tip = $"{t.Tytul}\n{time} ({s.LengthMinutes} min)\n{t.Priorytet} · {deadline}";
-        return new SessionRow(time, t.Tytul, details, tip, width, false, dueToday);
+        return new SessionRow(time, t.Tytul, details, tip, s.LengthMinutes, BrushFor(t.Priorytet), false, dueToday);
     }
 
     // czas od początku dnia pracy, np. 1:25

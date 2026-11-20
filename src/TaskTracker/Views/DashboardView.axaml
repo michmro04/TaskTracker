@@ -17,7 +17,13 @@
                         Spacing="8"
                         VerticalAlignment="Center"
                         Margin="0,0,12,0">
-                <TextBlock Text="Sortuj:" VerticalAlignment="Center"/>
+                <TextBlock Text="Tag:" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding TagOptions}"
+                          SelectedItem="{Binding SelectedTag}"
+                          Width="150"
+                          ToolTip.Tip="Pokaż tylko zadania z wybranym tagiem"/>
+
+                <TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="8,0,0,0"/>
                 <ComboBox ItemsSource="{Binding SortOptions}"
                           SelectedItem="{Binding SelectedSort}"
                           Width="130"/>

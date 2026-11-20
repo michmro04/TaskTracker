@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaskTracker.Models;
@@ -37,7 +37,7 @@ public sealed record SmartPlan(IReadOnlyList<PlannedDay> Days, IReadOnlyList<Pla
 /// <summary>
 /// Dzieli niewykonane zadania na sesje o długości od Min do Max minut i rozkłada je na kolejne dni.
 /// Reguły:
-///  - najpierw zadania z najbliższym terminem (EDF), przy remisie wyższy priorytet,
+///  - najpierw zadania o wyższym priorytecie, przy remisie bliższy termin,
 ///  - sesja trwa tyle, ile zostało pracy nad zadaniem, ale nie dłużej niż Max i nie krócej niż Min
 ///    (końcówka zadania krótsza niż Min jest zaokrąglana w górę do Min),
 ///  - zadanie nie jest planowane po swoim terminie (zadania po terminie traktowane są jak "na dziś"),
@@ -77,9 +77,9 @@ public static class SmartPlanner
                 return new Work(t, WorkFor(t.Priorytet, settings), deadline, overdue);
             })
             .Where(w => w.Remaining > 0)
-            // stała kolejność pilności: termin -> priorytet -> id
-            .OrderBy(w => w.Deadline ?? DateOnly.MaxValue)
-            .ThenByDescending(w => w.Task.Priorytet)
+            // stała kolejność: priorytet (wyższy wcześniej) -> termin -> id
+            .OrderByDescending(w => w.Task.Priorytet)
+            .ThenBy(w => w.Deadline ?? DateOnly.MaxValue)
             .ThenBy(w => w.Task.Id)
             .ToList();
 

@@ -72,10 +72,21 @@ public class SmartPlannerTests
     }
 
     [Fact]
-    public void EarliestDeadlineGoesFirst()
+    public void HigherPriorityGoesFirst()
     {
-        var later = new TaskItem { Id = 1, Tytul = "Później", Priorytet = Priority.Wysoki, Termin = Today.AddDays(4) };
-        var sooner = new TaskItem { Id = 2, Tytul = "Wcześniej", Priorytet = Priority.Niski, Termin = Today };
+        var high = new TaskItem { Id = 1, Tytul = "Wysoki", Priorytet = Priority.Wysoki, Termin = Today.AddDays(4) };
+        var low = new TaskItem { Id = 2, Tytul = "Niski", Priorytet = Priority.Niski, Termin = Today };
+
+        var plan = SmartPlanner.Build([low, high], Today, Settings());
+
+        Assert.Same(high, plan.Days[0].Sessions[0].Task);
+    }
+
+    [Fact]
+    public void SamePriority_EarlierDeadlineGoesFirst()
+    {
+        var later = new TaskItem { Id = 1, Tytul = "Później", Priorytet = Priority.Sredni, Termin = Today.AddDays(4) };
+        var sooner = new TaskItem { Id = 2, Tytul = "Wcześniej", Priorytet = Priority.Sredni, Termin = Today.AddDays(1) };
 
         var plan = SmartPlanner.Build([later, sooner], Today, Settings());
 

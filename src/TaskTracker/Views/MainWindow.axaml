@@ -48,7 +48,7 @@
 					<Button Content="Do zrobienia"
                             Command="{Binding ShowDashboardCommand}"
                             Classes.accent="{Binding IsDashboardActive}"/>
-					<Button Content="Wszystkie / Archiwum"
+					<Button Content="Archiwum"
                             Command="{Binding ShowAllTasksCommand}"
                             Classes.accent="{Binding IsAllTasksActive}"/>
 				</StackPanel>

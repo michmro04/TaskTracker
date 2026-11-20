@@ -21,6 +21,17 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
+    // po otwarciu okna wczytujemy ostatnio używany plik JSON
+    protected override async void OnOpened(System.EventArgs e)
+    {
+        base.OnOpened(e);
+
+        if (DataContext is MainWindowViewModel vm)
+        {
+            await vm.LoadLastFileAsync();
+        }
+    }
+
     private async void OnNewClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm)

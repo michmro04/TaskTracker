@@ -15,6 +15,7 @@ namespace TaskTracker.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ITaskStorageService _storageService;
+    private readonly AppSettingsService? _settingsService;
     private int _documentVersion = 1;
 
     public ObservableCollection<TaskItem> Tasks { get; } = [];
@@ -95,17 +96,19 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsDashboardActive => ActiveTabIndex == 1;
     public bool IsAllTasksActive => ActiveTabIndex == 2;
 
-    public MainWindowViewModel() : this(new JsonTaskStorageService())
+    public MainWindowViewModel() : this(new JsonTaskStorageService(), new AppSettingsService())
     {
     }
 
-    public MainWindowViewModel(ITaskStorageService storageService)
+    /// <param name="settingsService">Zapamiętuje ostatni plik; null = bez zapamiętywania (np. w testach).</param>
+    public MainWindowViewModel(ITaskStorageService storageService, AppSettingsService? settingsService = null)
     {
         _storageService = storageService;
+        _settingsService = settingsService;
 
         SmartVm = new SmartViewModel(Tasks);
         DashboardVm = new DashboardViewModel(this, Tasks);
-        AllTasksVm = new AllTasksViewModel(Tasks);
+        AllTasksVm = new AllTasksViewModel(this, Tasks);
         Tasks.CollectionChanged += OnTasksCollectionChanged;
 
         _currentPage = DashboardVm;
@@ -164,6 +167,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             CurrentFilePath = filePath;
             HasUnsavedChanges = false;
+            _settingsService?.RememberLastFile(filePath);
             StatusMessage = $"Wczytano {Tasks.Count} zadań z: {CurrentFileName}";
         }
         catch (Exception ex)
@@ -186,6 +190,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             CurrentFilePath = filePath;
             HasUnsavedChanges = false;
+            _settingsService?.RememberLastFile(filePath);
             StatusMessage = $"Zapisano {Tasks.Count} zadań do: {CurrentFileName}";
             return true;
         }
@@ -196,6 +201,24 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+
+    /// <summary>Przy starcie aplikacji wczytuje ostatnio używany (wczytany lub zapisany) plik JSON.</summary>
+    public async Task LoadLastFileAsync()
+    {
+        var path = _settingsService?.Load().LastFilePath;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return; // pierwszy start - nic nie było jeszcze zapisane
+        }
+
+        if (!File.Exists(path))
+        {
+            StatusMessage = $"Nie znaleziono ostatniego pliku: {path}";
+            return;
+        }
+
+        await LoadFromFileAsync(path);
+    }
 
     public int GetNextId()
     {
@@ -274,6 +297,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void RefreshPanels()
     {
         DashboardVm.Refresh();
+        AllTasksVm.Refresh();
         SmartVm.Recalculate();
     }
 
