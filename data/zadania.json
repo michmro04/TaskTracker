@@ -1,0 +1,232 @@
+{
+  "wersja": 1,
+  "zadania": [
+    {
+      "id": 1,
+      "tytul": "Kolokwium z sieci komputerowych",
+      "opis": "Rozdziały 3-5",
+      "termin": "2026-11-18",
+      "priorytet": "wysoki",
+      "wykonane": false,
+      "tagi": [
+        "studia"
+      ]
+    },
+    {
+      "id": 2,
+      "tytul": "Oddać sprawozdanie z laboratoriów z baz danych",
+      "opis": "Dodać diagram ERD, normalizację do 3NF i zrzuty z zapytań SQL.",
+      "termin": "2026-11-19",
+      "priorytet": "wysoki",
+      "wykonane": false,
+      "tagi": [
+        "studia",
+        "projekt"
+      ]
+    },
+    {
+      "id": 3,
+      "tytul": "Zrobić zakupy na obiad",
+      "opis": "Kurczak, ryż, brokuły, mleko i kawa.",
+      "termin": "2026-11-19",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "dom",
+        "zakupy"
+      ]
+    },
+    {
+      "id": 4,
+      "tytul": "Przygotować prezentację na seminarium",
+      "opis": "10 slajdów o wynikach eksperymentów i porównaniu metryk.",
+      "termin": "2026-11-20",
+      "priorytet": "wysoki",
+      "wykonane": false,
+      "tagi": [
+        "studia",
+        "prezentacja"
+      ]
+    },
+    {
+      "id": 5,
+      "tytul": "Opłacić czynsz i internet",
+      "opis": "",
+      "termin": "2026-11-17",
+      "priorytet": "wysoki",
+      "wykonane": true,
+      "tagi": [
+        "finanse",
+        "dom"
+      ]
+    },
+    {
+      "id": 6,
+      "tytul": "Przejrzeć notatki z algorytmów grafowych",
+      "opis": "Dijkstra, Bellman-Ford i algorytm Prima.",
+      "termin": "2026-11-22",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "studia"
+      ]
+    },
+    {
+      "id": 7,
+      "tytul": "Umówić wizytę u dentysty",
+      "opis": "",
+      "termin": null,
+      "priorytet": "niski",
+      "wykonane": false,
+      "tagi": [
+        "zdrowie"
+      ]
+    },
+    {
+      "id": 8,
+      "tytul": "Zrobić pranie i posprzątać biurko",
+      "opis": "Posegregować kable i wyrzucić stare notatki z zeszłego semestru.",
+      "termin": "2026-11-21",
+      "priorytet": "niski",
+      "wykonane": false,
+      "tagi": [
+        "dom"
+      ]
+    },
+    {
+      "id": 9,
+      "tytul": "Zadanie eliminacyjne na hackathon",
+      "opis": "Dokończyć MVP, wrzucić kod na GitHuba i nagrać 2-minutowe demo.",
+      "termin": "2026-11-22",
+      "priorytet": "wysoki",
+      "wykonane": false,
+      "tagi": [
+        "hackathon",
+        "projekt"
+      ]
+    },
+    {
+      "id": 10,
+      "tytul": "Odebrać paczkę z paczkomatu",
+      "opis": "Kod odbioru w aplikacji, czeka do jutra do 18:00.",
+      "termin": "2026-11-20",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": []
+    },
+    {
+      "id": 11,
+      "tytul": "Naprawić błąd w zadaniu z inżynierii oprogramowania",
+      "opis": "Test jednostkowy nie przechodzi dla pustej listy użytkowników.",
+      "termin": "2026-11-16",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "studia",
+        "projekt"
+      ]
+    },
+    {
+      "id": 12,
+      "tytul": "Iść pobiegać 5 km",
+      "opis": "Spokojne tempo po parku, rozciąganie na koniec.",
+      "termin": "2026-11-19",
+      "priorytet": "niski",
+      "wykonane": true,
+      "tagi": [
+        "sport",
+        "zdrowie"
+      ]
+    },
+    {
+      "id": 13,
+      "tytul": "Wypożyczyć książkę z biblioteki uczelnianej",
+      "opis": "Clean Architecture — Robert C. Martin.",
+      "termin": null,
+      "priorytet": "niski",
+      "wykonane": false,
+      "tagi": [
+        "studia"
+      ]
+    },
+    {
+      "id": 14,
+      "tytul": "Zaktualizować CV przed targami pracy",
+      "opis": "Dopisać nowe projekty z GitHuba i skrócić opis do 1 strony A4.",
+      "termin": "2026-11-27",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "kariera"
+      ]
+    },
+    {
+      "id": 15,
+      "tytul": "Zadzwonić do rodziców",
+      "opis": "",
+      "termin": "2026-11-21",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "osobiste"
+      ]
+    },
+    {
+      "id": 16,
+      "tytul": "Złożyć wniosek o przedłużenie legitymacji",
+      "opis": "Dziekanat otwarty we wtorki i czwartki 10:00-14:00.",
+      "termin": "2026-11-15",
+      "priorytet": "wysoki",
+      "wykonane": true,
+      "tagi": [
+        "studia",
+        "formalnosci"
+      ]
+    },
+    {
+      "id": 17,
+      "tytul": "Zrobić kopię zapasową plików z projektu",
+      "opis": "",
+      "termin": null,
+      "priorytet": "sredni",
+      "wykonane": true,
+      "tagi": []
+    },
+    {
+      "id": 18,
+      "tytul": "Kupić bilet miesięczny na komunikację",
+      "opis": "Ulgowy studencki na kolejny miesiąc.",
+      "termin": "2026-11-30",
+      "priorytet": "sredni",
+      "wykonane": false,
+      "tagi": [
+        "finanse",
+        "formalnosci"
+      ]
+    },
+    {
+      "id": 19,
+      "tytul": "Spotkanie zespołu projektowego online",
+      "opis": "Podział zadań na sprint i omówienie API.",
+      "termin": "2026-11-23",
+      "priorytet": "wysoki",
+      "wykonane": false,
+      "tagi": [
+        "studia",
+        "projekt"
+      ]
+    },
+    {
+      "id": 20,
+      "tytul": "Przeczytać dokumentację Avalonia UI",
+      "opis": "Sekcja o stylach, ThemeVariant i wiązaniu danych.",
+      "termin": null,
+      "priorytet": "niski",
+      "wykonane": true,
+      "tagi": [
+        "hackathon",
+        "nauka"
+      ]
+    }
+  ]
+}
