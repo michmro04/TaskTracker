@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             x:Class="TaskTracker.Views.AllTasksView"
+             x:DataType="vm:AllTasksViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Archiwum" FontSize="22" FontWeight="Bold"/>
+            <TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
+        </StackPanel>
+
+        <!-- kafelki wykonanych zadań (TaskCardView) - odznaczenie checkboxa cofa zadanie do "Do zrobienia" -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Cards}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <TextBlock Grid.Row="1"
+                   Text="Archiwum jest puste. Zaznacz zadanie jako wykonane w &quot;Do zrobienia&quot;."
+                   Opacity="0.6"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding IsEmpty}"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             x:Class="TaskTracker.Views.TaskEditorView"
+             x:DataType="vm:TaskEditorViewModel">
+
+    <ScrollViewer>
+        <Border MaxWidth="560"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Padding="24"
+                CornerRadius="10"
+                Background="{DynamicResource AppCardBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1">
+
+            <StackPanel Spacing="14">
+                <TextBlock Text="{Binding HeaderText}" FontSize="22" FontWeight="Bold"/>
+
+                <!-- tytuł -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Tytuł *"/>
+                    <TextBox Text="{Binding Tytul}" Watermark="np. Kolokwium z sieci"/>
+                    <TextBlock Text="{Binding TitleError}"
+                               Foreground="#EF4444"
+                               FontSize="12"
+                               IsVisible="{Binding TitleError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                </StackPanel>
+
+                <!-- opis -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Opis"/>
+                    <TextBox Text="{Binding Opis}"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             MinHeight="80"/>
+                </StackPanel>
+
+                <!-- termin + priorytet obok siebie -->
+                <Grid ColumnDefinitions="*,16,*">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Termin"/>
+                        <CalendarDatePicker SelectedDate="{Binding Termin}"
+                                            Watermark="Brak terminu"
+                                            HorizontalAlignment="Stretch"/>
+                        <TextBlock Text="{Binding DateError}"
+                                   Foreground="#EF4444"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding DateError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Spacing="4">
+                        <TextBlock Text="Priorytet"/>
+                        <ComboBox ItemsSource="{Binding Priorities}"
+                                  SelectedItem="{Binding Priorytet}"
+                                  HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- tagi -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Tagi (oddzielone przecinkami)"/>
+                    <TextBox Text="{Binding TagiText}" Watermark="np. studia, projekt"/>
+                </StackPanel>
+
+                <!-- tylko przy edycji -->
+                <CheckBox Content="Wykonane"
+                          IsChecked="{Binding Wykonane}"
+                          IsVisible="{Binding !IsNew}"/>
+
+                <!-- przyciski -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                    <Button Content="Anuluj" Command="{Binding CancelCommand}"/>
+                    <Button Content="Zapisz" Classes="accent" Command="{Binding SaveCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</UserControl>

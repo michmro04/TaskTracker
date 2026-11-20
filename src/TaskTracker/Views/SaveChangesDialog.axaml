@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TaskTracker.Views.SaveChangesDialog"
+        Title="Niezapisane zmiany"
+        Width="460"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBackgroundBrush}">
+
+    <StackPanel Margin="20" Spacing="18">
+        <TextBlock x:Name="MessageText"
+                   Text="Masz niezapisane zmiany."
+                   TextWrapping="Wrap"
+                   FontSize="14"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Zapisz" Classes="accent" IsDefault="True" Click="OnSaveClick"/>
+            <Button Content="Zapisz jako..." Click="OnSaveAsClick"/>
+            <Button Content="Nie zapisuj" Click="OnDontSaveClick"/>
+            <Button Content="Anuluj" IsCancel="True" Click="OnCancelClick"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -2,14 +2,52 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TaskTracker.App"
              xmlns:local="using:TaskTracker"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
-        <local:ViewLocator />
+        <local:ViewLocator/>
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1220"/>
+        <SolidColorBrush x:Key="AppHeaderBrush" Color="#111B2E"/>
+        <SolidColorBrush x:Key="AppCardBrush" Color="#162238"/>
+        <SolidColorBrush x:Key="AppButtonBrush" Color="#1E3252"/>
+        <SolidColorBrush x:Key="AppBorderBrush" Color="#28416B"/>
+        <SolidColorBrush x:Key="AppAccentBrush" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AppAccentForegroundBrush" Color="#FFFFFF"/>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
+
+        <Style Selector="Button:not(.accent)">
+            <Setter Property="Background" Value="{DynamicResource AppButtonBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+		<Style Selector="Button.accent">
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+        <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}"/>
+            <Setter Property="Opacity" Value="0.85"/>
+        </Style>
+
+        <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+        <Style Selector="Button.accent /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentForegroundBrush}"/>
+        </Style>
     </Application.Styles>
 </Application>

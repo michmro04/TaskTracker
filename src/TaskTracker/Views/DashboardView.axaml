@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             x:Class="TaskTracker.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="Do zrobienia" FontSize="22" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0">
+                <TextBlock Text="Tag:" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding TagOptions}"
+                          SelectedItem="{Binding SelectedTag}"
+                          Width="150"
+                          ToolTip.Tip="Pokaż tylko zadania z wybranym tagiem"/>
+
+                <TextBlock Text="Sortuj:" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <ComboBox ItemsSource="{Binding SortOptions}"
+                          SelectedItem="{Binding SelectedSort}"
+                          Width="130"/>
+            </StackPanel>
+
+            <Button Grid.Column="2"
+                    Content="+ Dodaj nowe zadanie"
+                    Classes="accent"
+                    VerticalAlignment="Center"
+                    Command="{Binding AddNewTaskCommand}"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Cards}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <TextBlock Grid.Row="1"
+                   Text="Brak zadań do zrobienia. Dodaj nowe albo wczytaj plik."
+                   Opacity="0.6"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsVisible="{Binding IsEmpty}"/>
+    </Grid>
+</UserControl>
