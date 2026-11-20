@@ -5,22 +5,37 @@
         Background="{DynamicResource AppBackgroundBrush}"
         x:Class="TaskTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="TaskTracker"
+        Title="{Binding WindowTitle}"
         Width="1050"
         Height="700"
         MinWidth="800"
         MinHeight="550">
 
 	<Grid RowDefinitions="Auto,*,Auto">
-		<!-- górny pasek nawigacji i plików json -->
         <Border Grid.Row="0" Padding="16,12" Background="{DynamicResource AppHeaderBrush}"
                 BorderThickness="0,0,0,1" BorderBrush="{DynamicResource AppBorderBrush}">
             <Grid ColumnDefinitions="Auto,*,Auto">
-				<TextBlock Grid.Column="0"
-                           Text="TaskTracker"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Spacing="12">
+                    <TextBlock Text="TaskTracker"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+
+                    <Button Content="Plik ▾">
+                        <Button.Flyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuItem Header="Nowy" Click="OnNewClick"/>
+                                <MenuItem Header="Wczytaj..." Click="OnLoadClick"/>
+                                <Separator/>
+                                <MenuItem Header="Zapisz" Click="OnSaveClick"/>
+                                <MenuItem Header="Zapisz jako..." Click="OnSaveAsClick"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
 
 				<!-- przełączanie 3 paneli -->
 				<StackPanel Grid.Column="1"
@@ -57,11 +72,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Button Content="{Binding ThemeButtonLabel}"
-                            Command="{Binding ToggleThemeCommand}"/>
-
-                    <Button Content="Wczytaj JSON" Click="OnLoadJsonClick"/>
-                    <Button Content="Zapisz JSON" Click="OnSaveJsonClick"/>
+                    <Button Content="+ test" Click="OnAddTestTaskClick"/>
                 </StackPanel>
 			</Grid>
 		</Border>

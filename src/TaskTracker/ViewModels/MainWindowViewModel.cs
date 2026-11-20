@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TaskTracker.Models;
 using TaskTracker.Services;
+using System.ComponentModel;
 
 namespace TaskTracker.ViewModels;
 
@@ -20,6 +21,39 @@ public partial class MainWindowViewModel : ViewModelBase
     public SmartViewModel SmartVm { get; }
     public DashboardViewModel DashboardVm { get; }
     public AllTasksViewModel AllTasksVm { get; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentFileName))]
+    [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    private string? currentFilePath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    private bool hasUnsavedChanges;
+
+    public string CurrentFileName
+    {
+        get
+        {
+            if (CurrentFilePath == null)
+            {
+                return "Nowy plik";
+            }
+            return Path.GetFileName(CurrentFilePath);
+        }
+    }
+
+    public string WindowTitle
+    {
+        get
+        {
+            if (HasUnsavedChanges)
+            {
+                return $"TaskTracker - {CurrentFileName} *";
+            }
+            return $"TaskTracker - {CurrentFileName}";
+        }
+    }
 
     [ObservableProperty]
     private ViewModelBase _currentPage;
@@ -104,20 +138,23 @@ public partial class MainWindowViewModel : ViewModelBase
         };
     }
 
-    public async Task LoadFromFileAsync(string filePath)
+        public async Task LoadFromFileAsync(string filePath)
     {
         try
         {
             var document = await _storageService.LoadAsync(filePath);
             _documentVersion = document.Wersja > 0 ? document.Wersja : 1;
 
-            Tasks.Clear();
+            ClearTasks();
             foreach (var item in document.Zadania)
             {
                 Tasks.Add(item);
+                StartTracking(item);
             }
 
-            StatusMessage = $"Wczytano {Tasks.Count} zadań z: {Path.GetFileName(filePath)}";
+            CurrentFilePath = filePath;
+            HasUnsavedChanges = false;
+            StatusMessage = $"Wczytano {Tasks.Count} zadań z: {CurrentFileName}";
         }
         catch (Exception ex)
         {
@@ -125,7 +162,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public async Task SaveToFileAsync(string filePath)
+    public async Task<bool> SaveToFileAsync(string filePath)
     {
         try
         {
@@ -136,11 +173,94 @@ public partial class MainWindowViewModel : ViewModelBase
             };
 
             await _storageService.SaveAsync(filePath, document);
-            StatusMessage = $"Zapisano {Tasks.Count} zadań do: {Path.GetFileName(filePath)}";
+
+            CurrentFilePath = filePath;
+            HasUnsavedChanges = false;
+            StatusMessage = $"Zapisano {Tasks.Count} zadań do: {CurrentFileName}";
+            return true;
         }
         catch (Exception ex)
         {
             StatusMessage = $"Błąd zapisu: {ex.Message}";
+            return false;
         }
+    }
+
+
+    public int GetNextId()
+    {
+        int maxId = 0;
+        foreach (var task in Tasks)
+        {
+            if (task.Id > maxId)
+            {
+                maxId = task.Id;
+            }
+        }
+        return maxId + 1;
+    }
+
+    public void AddTask(TaskItem task)
+    {
+        task.Id = GetNextId();
+        Tasks.Add(task);
+        StartTracking(task);
+        HasUnsavedChanges = true;
+        StatusMessage = $"Dodano zadanie: {task.Tytul}";
+    }
+
+    public void UpdateTask(TaskItem original, TaskItem edited)
+    {
+        original.Tytul = edited.Tytul;
+        original.Opis = edited.Opis;
+        original.Termin = edited.Termin;
+        original.Priorytet = edited.Priorytet;
+        original.Wykonane = edited.Wykonane;
+        original.Tagi = new List<string>(edited.Tagi);
+        StatusMessage = $"Zapisano zmiany w zadaniu: {original.Tytul}";
+    }
+
+    public void DeleteTask(TaskItem task)
+    {
+        if (Tasks.Remove(task))
+        {
+            StopTracking(task);
+            HasUnsavedChanges = true;
+            StatusMessage = $"Usunięto zadanie: {task.Tytul}";
+        }
+    }
+
+    public void NewDocument()
+    {
+        ClearTasks();
+        _documentVersion = 1;
+        CurrentFilePath = null;
+        HasUnsavedChanges = false;
+        StatusMessage = "Utworzono nowy, pusty plik zadań.";
+    }
+
+
+    private void StartTracking(TaskItem task)
+    {
+        task.PropertyChanged += OnTaskPropertyChanged;
+    }
+
+    private void StopTracking(TaskItem task)
+    {
+        task.PropertyChanged -= OnTaskPropertyChanged;
+    }
+
+    private void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        HasUnsavedChanges = true;
+    }
+
+    private void ClearTasks()
+    {
+        foreach (var task in Tasks)
+        {
+            StopTracking(task);
+        }
+        Tasks.Clear();
     }
 }
