@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TaskTracker.ViewModels"
+             xmlns:sys="using:System"
+             x:Class="TaskTracker.Views.TaskCardView"
+             x:DataType="vm:TaskCardViewModel">
+
+    <Border Width="330"
+            Margin="0,0,12,12"
+            Padding="14"
+            CornerRadius="10"
+            Background="{DynamicResource AppCardBrush}"
+            BorderBrush="{DynamicResource AppBorderBrush}"
+            BorderThickness="1">
+
+        <StackPanel Spacing="8">
+
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <CheckBox Grid.Column="0"
+                          IsChecked="{Binding Item.Wykonane}"
+                          ToolTip.Tip="Oznacz jako wykonane"
+                          VerticalAlignment="Top"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Item.Tytul}"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"/>
+
+                <Border Grid.Column="2"
+                        Background="{Binding PriorityBrush}"
+                        CornerRadius="10"
+                        Padding="8,2"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Top">
+                    <TextBlock Text="{Binding PriorityText}" FontSize="12" Foreground="White"/>
+                </Border>
+            </Grid>
+
+            <TextBlock Text="{Binding DeadlineText}"
+                       FontSize="13"
+                       Opacity="0.8"
+                       IsVisible="{Binding !IsOverdue}"/>
+            <TextBlock Text="{Binding DeadlineText}"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       Foreground="#EF4444"
+                       IsVisible="{Binding IsOverdue}"/>
+
+            <ItemsControl ItemsSource="{Binding Item.Tagi}" IsVisible="{Binding HasTags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="sys:String">
+                        <Border Background="{DynamicResource AppButtonBrush}"
+                                CornerRadius="8"
+                                Padding="8,2"
+                                Margin="0,0,6,6">
+                            <TextBlock Text="{Binding}" FontSize="12"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Expander Header="Opis"
+                      IsVisible="{Binding HasDescription}"
+                      HorizontalAlignment="Stretch">
+                <TextBlock Text="{Binding Item.Opis}" TextWrapping="Wrap"/>
+            </Expander>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        IsVisible="{Binding !IsConfirmingDelete}">
+                <Button Content="Edytuj" Command="{Binding EditCommand}"/>
+                <Button Content="Usuń" Command="{Binding AskDeleteCommand}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        IsVisible="{Binding IsConfirmingDelete}">
+                <TextBlock Text="Usunąć to zadanie?" VerticalAlignment="Center"/>
+                <Button Content="Tak, usuń"
+                        Background="#EF4444"
+                        Foreground="White"
+                        Command="{Binding ConfirmDeleteCommand}"/>
+                <Button Content="Nie" Command="{Binding CancelDeleteCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

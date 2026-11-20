@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TaskTracker.Models;
 using TaskTracker.Services;
 using System.ComponentModel;
+using System.Collections.Specialized;
 
 namespace TaskTracker.ViewModels;
 
@@ -103,8 +104,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _storageService = storageService;
 
         SmartVm = new SmartViewModel(Tasks);
-        DashboardVm = new DashboardViewModel(Tasks);
+        DashboardVm = new DashboardViewModel(this, Tasks);
         AllTasksVm = new AllTasksViewModel(Tasks);
+        Tasks.CollectionChanged += OnTasksCollectionChanged;
 
         _currentPage = DashboardVm;
         ThemeService.ApplyTheme(_selectedAccent, _isDarkMode);
@@ -119,23 +121,31 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ShowAllTasks() => NavigateTo(2);
 
-    private void NavigateTo(int targetIndex)
+        private void NavigateTo(int targetIndex)
     {
-        if (targetIndex == ActiveTabIndex)
+        bool editorOpen = CurrentPage is TaskEditorViewModel;
+
+        if (targetIndex == ActiveTabIndex && !editorOpen)
         {
             return;
         }
 
         IsSlideReversed = targetIndex < ActiveTabIndex;
         ActiveTabIndex = targetIndex;
+        CurrentPage = GetPageForTab(targetIndex);
+    }
 
-        CurrentPage = targetIndex switch
+    private ViewModelBase GetPageForTab(int index)
+    {
+        if (index == 0)
         {
-            0 => SmartVm,
-            1 => DashboardVm,
-            2 => AllTasksVm,
-            _ => DashboardVm
-        };
+            return SmartVm;
+        }
+        if (index == 2)
+        {
+            return AllTasksVm;
+        }
+        return DashboardVm;
     }
 
         public async Task LoadFromFileAsync(string filePath)
@@ -253,14 +263,49 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         HasUnsavedChanges = true;
+        RefreshPanels();
+    }
+
+    private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RefreshPanels();
+    }
+
+    private void RefreshPanels()
+    {
+        DashboardVm.Refresh();
     }
 
     private void ClearTasks()
     {
+        if (CurrentPage is TaskEditorViewModel)
+        {
+            CloseEditor();
+        }
         foreach (var task in Tasks)
         {
             StopTracking(task);
         }
         Tasks.Clear();
+    }
+
+        // ===== edytor zadań =====
+
+    [RelayCommand]
+    private void AddNewTask()
+    {
+        OpenEditor(null);
+    }
+
+    public void OpenEditor(TaskItem? task)
+    {
+        IsSlideReversed = false;
+        CurrentPage = new TaskEditorViewModel(this, task);
+    }
+
+    public void CloseEditor()
+    {
+        IsSlideReversed = true;
+        CurrentPage = GetPageForTab(ActiveTabIndex);
     }
 }

@@ -236,15 +236,6 @@
       "priorytet": "sredni",
       "wykonane": false,
       "tagi": []
-    },
-    {
-      "id": 22,
-      "tytul": "Zadanie testowe",
-      "opis": "",
-      "termin": null,
-      "priorytet": "sredni",
-      "wykonane": false,
-      "tagi": []
     }
   ]
 }

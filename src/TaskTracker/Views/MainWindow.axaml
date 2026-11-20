@@ -72,7 +72,9 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Button Content="+ test" Click="OnAddTestTaskClick"/>
+                    <Button Content="{Binding ThemeButtonLabel}"
+                            Command="{Binding ToggleThemeCommand}"/>
+
                 </StackPanel>
 			</Grid>
 		</Border>
