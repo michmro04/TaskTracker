@@ -133,4 +133,16 @@ public partial class DashboardViewModel : ViewModelBase
     {
         owner.OpenEditor(null);
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTileView))]
+    private bool isListView;
+
+    public bool IsTileView => !IsListView;
+
+    [RelayCommand]
+    private void SetTileView() => IsListView = false;
+
+    [RelayCommand]
+    private void SetListView() => IsListView = true;
 }

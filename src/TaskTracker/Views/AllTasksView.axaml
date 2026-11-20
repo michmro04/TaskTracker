@@ -1,32 +1,70 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:TaskTracker.ViewModels"
+             xmlns:views="using:TaskTracker.Views"
              x:Class="TaskTracker.Views.AllTasksView"
              x:DataType="vm:AllTasksViewModel">
 
-    <Grid RowDefinitions="Auto,*">
+	<Grid RowDefinitions="Auto,*">
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Archiwum" FontSize="22" FontWeight="Bold"/>
-            <TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
-        </StackPanel>
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center">
+				<TextBlock Text="Archiwum" FontSize="22" FontWeight="Bold"/>
+				<TextBlock Text="{Binding SummaryText}" Opacity="0.7"/>
+			</StackPanel>
 
-        <!-- kafelki wykonanych zadań (TaskCardView) - odznaczenie checkboxa cofa zadanie do "Do zrobienia" -->
-        <ScrollViewer Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding Cards}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </ScrollViewer>
+			<StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Spacing="4">
+				<Button Content="Kafelki"
+                        Command="{Binding SetTileViewCommand}"
+                        Classes.accent="{Binding IsTileView}"/>
+				<Button Content="Lista"
+                        Command="{Binding SetListViewCommand}"
+                        Classes.accent="{Binding IsListView}"/>
+			</StackPanel>
+		</Grid>
 
-        <TextBlock Grid.Row="1"
+		<!-- zadania wykonane (TaskCardView) - odznaczenie checkboxa cofa zadanie do "Do zrobienia" -->
+		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+			<ItemsControl ItemsSource="{Binding Cards}"
+                          Classes.list="{Binding IsListView}">
+				<ItemsControl.Styles>
+					<!-- Tryb kafelki -->
+					<Style Selector="ItemsControl:not(.list)">
+						<Setter Property="ItemsPanel">
+							<ItemsPanelTemplate>
+								<WrapPanel/>
+							</ItemsPanelTemplate>
+						</Setter>
+					</Style>
+					<Style Selector="ItemsControl:not(.list) views|TaskCardView">
+						<Setter Property="Width" Value="330"/>
+						<Setter Property="Margin" Value="0,0,12,12"/>
+					</Style>
+
+					<!-- Tryb lista -->
+					<Style Selector="ItemsControl.list">
+						<Setter Property="ItemsPanel">
+							<ItemsPanelTemplate>
+								<StackPanel Spacing="10"/>
+							</ItemsPanelTemplate>
+						</Setter>
+					</Style>
+					<Style Selector="ItemsControl.list views|TaskCardView">
+						<Setter Property="HorizontalAlignment" Value="Stretch"/>
+						<Setter Property="Margin" Value="0,0,12,0"/>
+					</Style>
+				</ItemsControl.Styles>
+			</ItemsControl>
+		</ScrollViewer>
+
+		<TextBlock Grid.Row="1"
                    Text="Archiwum jest puste. Zaznacz zadanie jako wykonane w &quot;Do zrobienia&quot;."
                    Opacity="0.6"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    IsVisible="{Binding IsEmpty}"/>
-    </Grid>
+	</Grid>
 </UserControl>
